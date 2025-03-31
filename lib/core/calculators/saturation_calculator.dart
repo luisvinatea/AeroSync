@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:math' show pow; // Import pow from dart:math
+import 'package:flutter/services.dart' show rootBundle;
 
 abstract class SaturationCalculator {
   final String dataPath;
@@ -11,40 +11,25 @@ abstract class SaturationCalculator {
   late String unit;
 
   SaturationCalculator(this.dataPath) {
-    loadData();
+    // Call async loadData in an async context later, not here
   }
 
-  void loadData() {
+  Future<void> loadData() async {
     try {
-      if (kIsWeb || dataPath.isEmpty) {
-        // Handle web or empty path case
-        throw UnsupportedError('Web platform requires using fromJson constructor');
-      } else {
-        final file = File(dataPath);
-        final data = jsonDecode(file.readAsStringSync());
-        _initializeFromJson(data);
-      }
-    } on FileSystemException {
-      throw Exception('Data file not found at $dataPath');
-    } on FormatException {
-      throw Exception('Invalid JSON format in data file');
+      final jsonString = await rootBundle.loadString(dataPath);
+      final data = jsonDecode(jsonString) as Map<String, dynamic>;
+      metadata = data['metadata'] as Map<String, dynamic>;
+      matrix = (data['data'] as List).map((row) => (row as List).map((e) => e as double).toList()).toList();
+      tempStep = metadata['temperature_range']['step'] as double;
+      salStep = metadata['salinity_range']['step'] as double;
+      unit = metadata['unit'] as String;
+    } catch (e) {
+      throw Exception('Failed to load or parse data from $dataPath: $e');
     }
   }
 
-  void _initializeFromJson(Map<String, dynamic> data) {
-    metadata = data['metadata'];
-    matrix = List<List<double>>.from(
-      (data['data'] as List).map(
-        (row) => List<double>.from((row as List).map((e) => e.toDouble()))
-      )
-    );
-    tempStep = metadata['temperature_range']['step'].toDouble();
-    salStep = metadata['salinity_range']['step'].toDouble();
-    unit = metadata['unit'];
-  }
-
   double getO2Saturation(double temperature, double salinity) {
-    if (temperature < 0 || temperature > 40 || salinity < 0 || salinity > 40) {
+    if (!(0 <= temperature && temperature <= 40 && 0 <= salinity && salinity <= 40)) {
       throw ArgumentError('Temperature and salinity must be between 0 and 40');
     }
     final tempIdx = (temperature / tempStep).floor();
@@ -52,28 +37,18 @@ abstract class SaturationCalculator {
     return matrix[tempIdx][salIdx];
   }
 
-  double calculateSotr(double temperature, double salinity, double volume,
-      [double efficiency = 0.9]);
+  double calculateSotr(double temperature, double salinity, double volume, {double efficiency = 0.9});
 }
 
 class ShrimpPondCalculator extends SaturationCalculator {
   static const Map<String, double> sotrPerHp = {
     'Generic Paddlewheel': 1.8,
-    // 'AquaPaddle Model X V1': 1.9,
-    // 'PaddlePro Model Y V2': 1.7,
   };
 
-  ShrimpPondCalculator(super.dataPath);
-
-  factory ShrimpPondCalculator.fromJson(Map<String, dynamic> json) {
-    final calculator = ShrimpPondCalculator('');
-    calculator._initializeFromJson(json);
-    return calculator;
-  }
+  ShrimpPondCalculator(String dataPath) : super(dataPath);
 
   @override
-  double calculateSotr(double temperature, double salinity, double volume,
-      [double efficiency = 0.9]) {
+  double calculateSotr(double temperature, double salinity, double volume, {double efficiency = 0.9}) {
     final saturation = getO2Saturation(temperature, salinity);
     final saturationKgM3 = saturation * 0.001;
     return saturationKgM3 * volume * efficiency;
@@ -92,13 +67,13 @@ class ShrimpPondCalculator extends SaturationCalculator {
     double waterDepthFactor = 1.0,
     double placementFactor = 1.0,
   }) {
-    final powerKw = hp * 0.746;
+    final powerKw = hp * 0.746; // 1 hp = 0.746 kW
     final cs = getO2Saturation(temperature, salinity);
     final cs20 = getO2Saturation(20, salinity);
-    final cs20KgM3 = cs20 * 0.001;
+    final cs20KgM3 = cs20 * 0.001; // mg/L to kg/m³
 
-    final klaT = 1.1 / ((t70 - t10) / 60);
-    final kla20 = klaT * (1.024.pow((20 - temperature).toInt()));
+    final klaT = 1.1 / ((t70 - t10) / 60); // Convert time difference to hours
+    final kla20 = klaT * pow(1.024, 20 - temperature).toDouble(); // Use pow from dart:math
 
     final sotr = kla20 * cs20KgM3 * volume;
     final sae = powerKw > 0 ? sotr / powerKw : 0;
@@ -117,29 +92,14 @@ class ShrimpPondCalculator extends SaturationCalculator {
   }
 
   double getIdealVolume(double hp) {
-    switch (hp) {
-      case 2:
-        return 40;
-      case 3:
-        return 70;
-      default:
-        return hp * 25;
-    }
+    if (hp == 2) return 40;
+    if (hp == 3) return 70;
+    return hp * 25;
   }
 
-  double getIdealHp(double volume) {
+  int getIdealHp(double volume) {
     if (volume <= 40) return 2;
     if (volume <= 70) return 3;
-    return (volume / 25).floorToDouble();
-  }
-}
-
-extension _Power on num {
-  double pow(int exponent) {
-    var result = 1.0;
-    for (var i = 0; i < exponent; i++) {
-      result *= this;
-    }
-    return result;
+    return (volume / 25).ceil().clamp(2, double.infinity).toInt();
   }
 }
