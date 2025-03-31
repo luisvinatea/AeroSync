@@ -1,0 +1,11 @@
+{
+  "@@locale": "pt",
+  "appTitle": "AeroSync",
+  "calculate": "Calcular",
+  "temperature": "Temperatura",
+  "salinity": "Salinidade",
+  "errorInvalidInput": "Entrada Inválida",
+  "@errorInvalidInput": {
+    "description": "Mensagem de erro quando a entrada é inválida"
+  }
+}

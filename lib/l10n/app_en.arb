@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "appTitle": "AeroSync",
+  "calculate": "Calculate",
+  "temperature": "Temperature",
+  "salinity": "Salinity",
+  "errorInvalidInput": "Invalid input",
+  "@errorInvalidInput": {
+    "description": "Error message shown when input is invalid"
+  }
+}
