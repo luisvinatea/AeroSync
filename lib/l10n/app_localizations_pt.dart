@@ -9,7 +9,7 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get appTitle => 'AeroSync';
+  String get appTitle => 'AeraSync';
 
   @override
   String get calculate => 'Calcular';

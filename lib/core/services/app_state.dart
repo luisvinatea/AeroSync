@@ -1,4 +1,4 @@
-import 'package:aerosync/core/services/calculator_service_platform.dart';
+import 'package:AeraSync/core/services/calculator_service_platform.dart';
 import 'package:flutter/material.dart'; // Add this for ChangeNotifier
 import '../calculators/saturation_calculator.dart';
 // No need for calculator_service_interface.dart unless you're using it elsewhere

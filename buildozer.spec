@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = AeroSync
+title = AeraSync
 
 # (str) Package name
-package.name = aerosync
+package.name = AeraSync
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = com.aerosync
+package.domain = com.AeraSync
 
 # (str) Source code where the main.py live
 source.dir = .

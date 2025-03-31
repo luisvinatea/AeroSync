@@ -1,6 +1,6 @@
 {
-    "name": "aerosync",
-    "short_name": "aerosync",
+    "name": "aerasync",
+    "short_name": "aerasync",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

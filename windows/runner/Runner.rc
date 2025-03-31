@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.aerosync" "\0"
-            VALUE "FileDescription", "aerosync" "\0"
+            VALUE "CompanyName", "com.AeraSync" "\0"
+            VALUE "FileDescription", "AeraSync" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "aerosync" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.aerosync. All rights reserved." "\0"
-            VALUE "OriginalFilename", "aerosync.exe" "\0"
-            VALUE "ProductName", "aerosync" "\0"
+            VALUE "InternalName", "AeraSync" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.AeraSync. All rights reserved." "\0"
+            VALUE "OriginalFilename", "AeraSync.exe" "\0"
+            VALUE "ProductName", "AeraSync" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
     final appState = Provider.of<AppState>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('AeroSync Calculator')),
+      appBar: AppBar(title: const Text('AeraSync Calculator')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: appState.isLoading

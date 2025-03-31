@@ -1,6 +1,6 @@
-# AeroSync
+# AeraSync
 
-AeroSync is a mobile application designed to streamline the calculation and tracking of the Standard Oxygen Transfer Rate (SOTR) and Standard Aeration Efficiency (SAE) for aerators in aquaculture ponds. The app provides a seamless interface for technicians to perform daily checkpointing, ensuring accurate and efficient monitoring of aeration performance. Future versions will incorporate AI-driven predictions to optimize aeration efficiency.
+AeraSync is a mobile application designed to streamline the calculation and tracking of the Standard Oxygen Transfer Rate (SOTR) and Standard Aeration Efficiency (SAE) for aerators in aquaculture ponds. The app provides a seamless interface for technicians to perform daily checkpointing, ensuring accurate and efficient monitoring of aeration performance. Future versions will incorporate AI-driven predictions to optimize aeration efficiency.
 
 ## Features
 
@@ -13,11 +13,11 @@ AeroSync is a mobile application designed to streamline the calculation and trac
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/yourusername/AeroSync.git
+   git clone https://github.com/yourusername/AeraSync.git
    ```
 2. Navigate to the project directory:
    ```sh
-   cd AeroSync
+   cd AeraSync
    ```
 3. Install dependencies:
    ```sh
