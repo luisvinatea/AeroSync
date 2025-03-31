@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../calculators/saturation_calculator.dart';
-import 'calculator_service.dart'
+import 'calculator_service.dart';
 
 class AppState extends ChangeNotifier {
   ShrimpPondCalculator? _calculator;
@@ -16,7 +16,7 @@ class AppState extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
       
-      _calculator = await CalculatorService.initialize();
+      _calculator = await CalculatorServicePlatform.instance.initialize();
       _error = null;
     } catch (e) {
       _error = e.toString();

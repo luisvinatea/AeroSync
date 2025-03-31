@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 abstract class SaturationCalculator {
   final String dataPath;
@@ -15,20 +16,31 @@ abstract class SaturationCalculator {
 
   void loadData() {
     try {
-      final file = File(dataPath);
-      final data = jsonDecode(file.readAsStringSync());
-      metadata = data['metadata'];
-      matrix = (data['data'] as List)
-          .map((row) => (row as List).map((e) => e.toDouble()).toList())
-          .toList();
-      tempStep = metadata['temperature_range']['step'].toDouble();
-      salStep = metadata['salinity_range']['step'].toDouble();
-      unit = metadata['unit'];
+      if (kIsWeb || dataPath.isEmpty) {
+        // Handle web or empty path case
+        throw UnsupportedError('Web platform requires using fromJson constructor');
+      } else {
+        final file = File(dataPath);
+        final data = jsonDecode(file.readAsStringSync());
+        _initializeFromJson(data);
+      }
     } on FileSystemException {
       throw Exception('Data file not found at $dataPath');
     } on FormatException {
       throw Exception('Invalid JSON format in data file');
     }
+  }
+
+  void _initializeFromJson(Map<String, dynamic> data) {
+    metadata = data['metadata'];
+    matrix = List<List<double>>.from(
+      (data['data'] as List).map(
+        (row) => List<double>.from((row as List).map((e) => e.toDouble()))
+      )
+    );
+    tempStep = metadata['temperature_range']['step'].toDouble();
+    salStep = metadata['salinity_range']['step'].toDouble();
+    unit = metadata['unit'];
   }
 
   double getO2Saturation(double temperature, double salinity) {
@@ -52,6 +64,12 @@ class ShrimpPondCalculator extends SaturationCalculator {
   };
 
   ShrimpPondCalculator(super.dataPath);
+
+  factory ShrimpPondCalculator.fromJson(Map<String, dynamic> json) {
+    final calculator = ShrimpPondCalculator('');
+    calculator._initializeFromJson(json);
+    return calculator;
+  }
 
   @override
   double calculateSotr(double temperature, double salinity, double volume,
