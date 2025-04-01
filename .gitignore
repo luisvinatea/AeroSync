@@ -1,0 +1,64 @@
+### Node.js / React Native / Flutter / Swift / Kotlin specific .gitignore
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Build files
+build/
+dist/
+out/
+
+# React Native specific
+android/
+ios/
+.expo/
+
+# Flutter specific
+*.flutter-plugins
+*.flutter-plugins-dependencies
+.dart_tool/
+build/
+
+# Swift specific
+DerivedData/
+*.xcworkspace
+*.xcodeproj/
+*.xcuserdata/
+
+# Kotlin specific
+*.iml
+.idea/
+*.kts
+.gradle/
+/local.properties
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# System files
+.DS_Store
+Thumbs.db
+
+
+# Python specific
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Data files
+backend/data/*.csv
+backend/data/*.log
