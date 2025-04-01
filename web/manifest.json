@@ -1,32 +1,32 @@
 {
-    "name": "aerasync",
-    "short_name": "aerasync",
-    "start_url": ".",
+    "name": "AeraSync",
+    "short_name": "AeraSync",
+    "start_url": "/AeraSync",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#f0f4f8",
+    "theme_color": "#1a73e8",
+    "description": "SOTR Calculator",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
+            "src": "icons/aerasync180.png",
+            "sizes": "180x180",
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-512.png",
+            "src": "icons/aerasync512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
+            "src": "icons/aerasync64.png",
+            "sizes": "64x64",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/Icon-maskable-512.png",
+            "src": "icons/aerasync1024.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
