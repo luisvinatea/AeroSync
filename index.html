@@ -14,7 +14,7 @@
   <meta name="author" content="Luis Vinatea">
 
   <!-- Mobile and iOS-specific meta tags -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=3.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AeraSync">
@@ -34,6 +34,12 @@
 
   <!-- Inline CSS for branded loading screen -->
   <style>
+    /* Ensure pinch-to-zoom is enabled */
+    body, html {
+      touch-action: pan-x pan-y pinch-zoom !important; /* Explicitly allow pinch-zoom */
+      -webkit-user-scalable: yes; /* For older Safari versions */
+    }
+
     /* Loading screen styles - will be hidden when Flutter loads */
     #loading-screen {
       position: fixed;
@@ -149,17 +155,24 @@
   <!-- Flutter app script with loading screen removal -->
   <script src="flutter_bootstrap.js" async></script>
   <script>
-    // Listen for the Flutter initialization event
-    window.addEventListener('flutter-first-frame', function() {
-      // Fade out the loading screen
-      var loadingScreen = document.getElementById('loading-screen');
-      loadingScreen.style.opacity = '0';
-      
-      // Remove the loading screen after fade completes
-      setTimeout(function() {
-        loadingScreen.style.display = 'none';
-      }, 500); // Match this with the CSS transition duration
-    });
-  </script>
+      // Prevent default touch event suppression
+      document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+          event.stopPropagation();
+        }
+      }, { passive: false });
+
+      // Listen for the Flutter initialization event
+      window.addEventListener('flutter-first-frame', function() {
+        var loadingScreen = document.getElementById('loading-screen');
+        var flutterApp = document.getElementById('flutter-app');
+        loadingScreen.style.opacity = '0';
+        flutterApp.style.display = 'block';
+        
+        setTimeout(function() {
+          loadingScreen.style.display = 'none';
+        }, 500);
+      });
+</script>
 </body>
 </html>
