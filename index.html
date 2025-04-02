@@ -34,17 +34,21 @@
 
   <!-- Inline CSS for branded loading screen -->
   <style>
-    body {
-      margin: 0;
-      padding: 0;
+    /* Loading screen styles - will be hidden when Flutter loads */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       /* Gradient background inspired by the logo */
       background: linear-gradient(180deg, #60A5FA 0%, #1E40AF 100%);
       font-family: 'Montserrat', Arial, sans-serif;
-      overflow: hidden;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
     }
 
     /* Loading container */
@@ -105,6 +109,13 @@
       z-index: 0;
     }
 
+    /* Flutter app container */
+    #flutter-app {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
     /* Animations */
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -118,18 +129,37 @@
   </style>
 </head>
 <body>
-  <!-- Wave overlay for background -->
-  <div class="wave-overlay"></div>
+  <!-- Loading screen container -->
+  <div id="loading-screen">
+    <!-- Wave overlay for background -->
+    <div class="wave-overlay"></div>
 
-  <!-- Loading screen -->
-  <div class="loading">
-    <!-- Logo -->
-    <img src="icons/aerasync.png" alt="AeraSync Logo" style="width: 100px; height: auto; margin-bottom: 20px;">
-    <h1>AeraSync</h1>
-    <div class="spinner"></div>
+    <!-- Loading content -->
+    <div class="loading">
+      <!-- Logo -->
+      <img src="icons/aerasync.png" alt="AeraSync Logo" style="width: 100px; height: auto; margin-bottom: 20px;">
+      <h1>AeraSync</h1>
+      <div class="spinner"></div>
+    </div>
   </div>
 
-  <!-- Flutter app script -->
+  <!-- Flutter app container -->
+  <div id="flutter-app"></div>
+
+  <!-- Flutter app script with loading screen removal -->
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Listen for the Flutter initialization event
+    window.addEventListener('flutter-first-frame', function() {
+      // Fade out the loading screen
+      var loadingScreen = document.getElementById('loading-screen');
+      loadingScreen.style.opacity = '0';
+      
+      // Remove the loading screen after fade completes
+      setTimeout(function() {
+        loadingScreen.style.display = 'none';
+      }, 500); // Match this with the CSS transition duration
+    });
+  </script>
 </body>
 </html>
