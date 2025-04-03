@@ -1,50 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Base href for GitHub Pages deployment -->
   <base href="/AeraSync/">
 
-  <!-- Character encoding and browser compatibility -->
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-
-  <!-- Metadata for SEO and app identity -->
   <meta name="description" content="AeraSync: Calculate aerator performance for shrimp ponds with precision.">
   <meta name="keywords" content="AeraSync, aerator, shrimp pond, calculator, aquaculture">
   <meta name="author" content="Luis Vinatea">
-
-  <!-- Mobile and iOS-specific meta tags -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AeraSync">
-  <link rel="apple-touch-icon" href="icons/aerasync.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png">
-
-  <!-- Page title -->
+  <link rel="apple-touch-icon" href="icons/aerasync180.png">
+  <link rel="icon" type="image/png" href="icons/aerasync64.png">
   <title>AeraSync - Aerator Calculator</title>
-
-  <!-- Web manifest for PWA support -->
   <link rel="manifest" href="manifest.json">
-
-  <!-- Google Fonts for Montserrat -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Inline CSS for branded loading screen -->
   <style>
-    /* Ensure pinch-to-zoom is enabled */
     body, html {
-      touch-action: pan-x pan-y pinch-zoom !important; /* Explicitly allow pinch-zoom */
-      -webkit-user-scalable: yes; /* For older Safari versions */
+      touch-action: pan-x pan-y pinch-zoom !important;
+      -webkit-user-scalable: yes;
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
     }
 
-    /* Loading screen styles - will be hidden when Flutter loads */
     #loading-screen {
       position: fixed;
       top: 0;
@@ -60,7 +43,6 @@
       transition: opacity 0.5s ease-out;
     }
 
-    /* Loading container */
     .loading {
       text-align: center;
       color: #FFFFFF;
@@ -75,7 +57,6 @@
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    /* Hexagonal spinner inspired by the logo */
     .spinner {
       width: 50px;
       height: 50px;
@@ -105,27 +86,24 @@
       animation: spin 1s linear infinite reverse;
     }
 
-    /* Wave overlay for background */
     .wave-overlay {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 50%;
+      height: 70%;
       background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.2)" fill-opacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,186.7C960,213,1056,235,1152,213.3C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
-      background-size: 100% 100%;
-      animation: wave 10s linear infinite;
+      background-size: 200% 100%;
+      animation: wave 15s linear infinite;
       z-index: 0;
     }
 
-    /* Flutter app container */
     #flutter-app {
       display: none;
       width: 100%;
       height: 100%;
     }
 
-    /* Animations */
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -138,34 +116,23 @@
   </style>
 </head>
 <body>
-  <!-- Loading screen container -->
   <div id="loading-screen">
-    <!-- Wave overlay for background -->
     <div class="wave-overlay"></div>
-
-    <!-- Loading content -->
     <div class="loading">
-      <!-- Logo -->
-      <img src="icons/aerasync.png" alt="AeraSync Logo" style="width: 100px; height: auto; margin-bottom: 20px;">
+      <img src="icons/aerasync.png" alt="AeraSync Logo" style="width: 200px; height: auto; margin-bottom: 20px;"> <!-- Updated to aerasync.png and larger size -->
       <h1>AeraSync</h1>
       <div class="spinner"></div>
     </div>
   </div>
-
-  <!-- Flutter app container -->
   <div id="flutter-app"></div>
-
-  <!-- Flutter app script with loading screen removal -->
   <script src="flutter_bootstrap.js" async></script>
   <script>
-    // Prevent default touch event suppression
     document.addEventListener('touchstart', function(event) {
       if (event.touches.length > 1) {
         event.stopPropagation();
       }
     }, { passive: false });
 
-    // Listen for the Flutter initialization event
     window.addEventListener('flutter-first-frame', function() {
       var loadingScreen = document.getElementById('loading-screen');
       var flutterApp = document.getElementById('flutter-app');

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/services/app_state.dart';
 import '../../core/calculators/saturation_calculator.dart';
 
@@ -52,136 +53,158 @@ class _CalculatorFormState extends State<CalculatorForm> {
                 ? Center(
                     child: Text('Error: ${appState.error}',
                         style: const TextStyle(color: Colors.red)))
-                : Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const Text(
-                          'Aerator Performance Calculator',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E40AF),
-                          ),
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Aerator Performance Calculator',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E40AF),
                         ),
-                        const SizedBox(height: 10),
-                        _buildTextField(_tempController, 'Temperature (°C)', 0, 40),
-                        _buildTextField(_salinityController, 'Salinity (‰)', 0, 40),
-                        _buildTextField(_hpController, 'Horsepower (HP)', 0, 100),
-                        _buildTextField(_volumeController, 'Volume (m³)', 0, 1000),
-                        _buildTextField(_t10Controller, 'T10 (minutes)', 0, 60),
-                        _buildTextField(_t70Controller, 'T70 (minutes)', 0, 60),
-                        _buildTextField(_kwhController, 'Electricity Cost (\$/kWh)', 0, 1),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _brandController,
-                          decoration: InputDecoration(
-                            labelText: 'Brand (Optional)',
-                            labelStyle: const TextStyle(fontSize: 14),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: _selectedType,
-                          items: _aeratorTypes.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value, style: const TextStyle(fontSize: 14)),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedType = value!;
-                              _showOtherTypeField = (value == 'Other');
-                            });
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Aerator Type',
-                            labelStyle: const TextStyle(fontSize: 14),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                          ),
-                        ),
-                        if (_showOtherTypeField) ...[
-                          const SizedBox(height: 4),
-                          TextFormField(
-                            controller: _otherTypeController,
-                            decoration: InputDecoration(
-                              labelText: 'Specify Aerator Type',
-                              labelStyle: const TextStyle(fontSize: 14),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                            ),
-                            validator: (value) {
-                              if (_showOtherTypeField && (value == null || value.isEmpty)) {
-                                return 'Please specify the aerator type';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                        const SizedBox(height: 12),
-                        ElevatedButton(
-                          onPressed: _dataCollectionConsent && _formKey.currentState!.validate()
-                              ? _calculate
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                            backgroundColor: const Color(0xFF1E40AF),
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Calculate', style: TextStyle(fontSize: 14)),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
+                      ),
+                      const SizedBox(height: 10),
+                      Form(
+                        key: _formKey,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Checkbox(
-                              value: _dataCollectionConsent,
-                              onChanged: (value) {
-                                setState(() {
-                                  _dataCollectionConsent = value ?? false;
-                                });
-                              },
-                            ),
                             Expanded(
-                              child: Text(
-                                'I agree to allow my data to be collected safely for research purposes, in accordance with applicable laws.',
-                                style: TextStyle(fontSize: 14),
+                              child: Column(
+                                children: [
+                                  _buildTextField(_tempController, 'Temperature (°C)', 0, 40),
+                                  _buildTextField(_salinityController, 'Salinity (‰)', 0, 40),
+                                  _buildTextField(_hpController, 'Horsepower (HP)', 0, 100),
+                                  _buildTextField(_volumeController, 'Volume (m³)', 0, 1000),
+                                ],
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Privacy Policy'),
-                                    content: const Text(
-                                        'Your data will be used for research purposes only and will be stored securely...'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('Close'),
-                                      ),
-                                    ],
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _buildTextField(_t10Controller, 'T10 (minutes)', 0, 60),
+                                  _buildTextField(_t70Controller, 'T70 (minutes)', 0, 60),
+                                  _buildTextField(_kwhController, 'Electricity Cost (\$/kWh)', 0, 1),
+                                  TextFormField(
+                                    controller: _brandController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Brand (Optional)',
+                                      labelStyle: const TextStyle(fontSize: 16),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                                      filled: true,
+                                      fillColor: Colors.grey[100],
+                                      contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                                    ),
+                                    style: const TextStyle(fontSize: 16),
                                   ),
-                                );
-                              },
-                              child: const Text('Learn More', style: TextStyle(fontSize: 14)),
+                                  const SizedBox(height: 8),
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedType,
+                                    items: _aeratorTypes.map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value, style: const TextStyle(fontSize: 16)),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedType = value!;
+                                        _showOtherTypeField = (value == 'Other');
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Aerator Type',
+                                      labelStyle: const TextStyle(fontSize: 16),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                                      filled: true,
+                                      fillColor: Colors.grey[100],
+                                      contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                                    ),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  if (_showOtherTypeField) ...[
+                                    const SizedBox(height: 8),
+                                    TextFormField(
+                                      controller: _otherTypeController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Specify Aerator Type',
+                                        labelStyle: const TextStyle(fontSize: 16),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                                        filled: true,
+                                        fillColor: Colors.grey[100],
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                                      ),
+                                      style: const TextStyle(fontSize: 16),
+                                      validator: (value) {
+                                        if (_showOtherTypeField && (value == null || value.isEmpty)) {
+                                          return 'Please specify the aerator type';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 12),
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Transform.scale(
+                                scale: 1.5, // Increased checkbox size
+                                child: Checkbox(
+                                  value: _dataCollectionConsent,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _dataCollectionConsent = value ?? false;
+                                    });
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'I agree to allow my data to be collected safely for research purposes, in accordance with applicable laws.',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  final url = Uri.parse('https://luisvinatea.github.io/AeraSync/privacy.html');
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Could not open privacy policy')),
+                                    );
+                                  }
+                                },
+                                child: const Text('Learn More', style: TextStyle(fontSize: 16)),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: _dataCollectionConsent && _formKey.currentState!.validate()
+                                ? _calculate
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                              backgroundColor: const Color(0xFF1E40AF),
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Calculate', style: TextStyle(fontSize: 16)),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
       ),
     );
@@ -189,19 +212,19 @@ class _CalculatorFormState extends State<CalculatorForm> {
 
   Widget _buildTextField(TextEditingController controller, String label, double min, double max) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(fontSize: 14),
+          labelStyle: const TextStyle(fontSize: 16),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
           filled: true,
           fillColor: Colors.grey[100],
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         ),
-        style: const TextStyle(fontSize: 14),
-        keyboardType: const TextInputType.numberWithOptions(decimal: true), // Allow decimals
+        style: const TextStyle(fontSize: 16),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
         validator: (value) => _validateInput(value, min, max),
       ),
     );

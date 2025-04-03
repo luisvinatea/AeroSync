@@ -1,35 +1,30 @@
 {
     "name": "AeraSync",
     "short_name": "AeraSync",
-    "start_url": "/AeraSync",
+    "start_url": "/AeraSync/",
     "display": "standalone",
-    "background_color": "#f0f4f8",
-    "theme_color": "#1a73e8",
-    "description": "SOTR Calculator",
-    "orientation": "portrait-primary",
-    "prefer_related_applications": false,
+    "background_color": "#1E40AF",
+    "theme_color": "#60A5FA",
     "icons": [
-        {
-            "src": "icons/aerasync180.png",
-            "sizes": "180x180",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/aerasync512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/aerasync64.png",
-            "sizes": "64x64",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/aerasync1024.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
+      {
+        "src": "icons/aerasync64.png",
+        "sizes": "64x64",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/aerasync180.png",
+        "sizes": "180x180",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/aerasync400.png",
+        "sizes": "400x400",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/aerasync512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
     ]
-}
+  }

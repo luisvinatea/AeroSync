@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:universal_html/html.dart' as html; // For web download
+import 'package:universal_html/html.dart' as html;
 import '../../core/services/app_state.dart';
 
 class ResultsDisplay extends StatelessWidget {
@@ -74,7 +74,7 @@ class ResultsDisplay extends StatelessWidget {
                       alignment: Alignment.center,
                       child: ElevatedButton.icon(
                         onPressed: () => _downloadAsCsv(appState.inputs!, appState.results!),
-                        icon: const Icon(Icons.download),
+                        icon: const Icon(Icons.download, size: 32), // Increased icon size
                         label: const Text('Download as CSV'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -96,12 +96,10 @@ class ResultsDisplay extends StatelessWidget {
 
   String _formatValue(dynamic value) {
     if (value is double) {
-      // For truncated values, display as-is without additional rounding
       if (['SOTR (kg O₂/h)', 'SAE (kg O₂/kWh)', 'US\$/kg O₂', 'Power (kW)']
           .contains(value)) {
-        return value.toStringAsFixed(2); // Already truncated in calculator
+        return value.toStringAsFixed(2);
       }
-      // For full-precision values (e.g., KlaT, Kla20), limit to 6 decimals
       return value.toStringAsFixed(6).replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
     }
     return value.toString();
