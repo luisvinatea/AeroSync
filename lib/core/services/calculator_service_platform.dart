@@ -11,6 +11,6 @@ abstract class CalculatorServicePlatform {
 class CalculatorServicePlatformImpl implements CalculatorServicePlatform {
   @override
   Future<ShrimpPondCalculator> initialize() async {
-    return CalculatorService().initialize();
+    return await CalculatorService().initialize(); // Delegate to concrete service
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math' show pow; // Import pow from dart:math
+import 'dart:math' show pow;
 import 'package:flutter/services.dart' show rootBundle;
 
 abstract class SaturationCalculator {
@@ -10,9 +10,7 @@ abstract class SaturationCalculator {
   late double salStep;
   late String unit;
 
-  SaturationCalculator(this.dataPath) {
-    // Call async loadData in an async context later, not here
-  }
+  SaturationCalculator(this.dataPath);
 
   Future<void> loadData() async {
     try {
@@ -32,7 +30,7 @@ abstract class SaturationCalculator {
     if (!(0 <= temperature && temperature <= 40 && 0 <= salinity && salinity <= 40)) {
       throw ArgumentError('Temperature and salinity must be between 0 and 40');
     }
-    final tempIdx = (temperature / tempStep).floor();
+    final tempIdx = temperature.round(); // Round temperature to nearest integer
     final salIdx = (salinity / salStep).floor();
     return matrix[tempIdx][salIdx];
   }
@@ -51,7 +49,7 @@ class ShrimpPondCalculator extends SaturationCalculator {
   double calculateSotr(double temperature, double salinity, double volume, {double efficiency = 0.9}) {
     final saturation = getO2Saturation(temperature, salinity);
     final saturationKgM3 = saturation * 0.001;
-    return saturationKgM3 * volume * efficiency;
+    return (saturationKgM3 * volume * efficiency * 100).floorToDouble() / 100; // Truncate to 2 decimals
   }
 
   Map<String, dynamic> calculateMetrics({
@@ -63,21 +61,18 @@ class ShrimpPondCalculator extends SaturationCalculator {
     required double t70,
     required double kwhPrice,
     required String aeratorId,
-    double doDeficitFactor = 1.0,
-    double waterDepthFactor = 1.0,
-    double placementFactor = 1.0,
   }) {
-    final powerKw = hp * 0.746; // 1 hp = 0.746 kW
+    final powerKw = (hp * 0.746 * 100).floorToDouble() / 100; // Truncate to 2 decimals
     final cs = getO2Saturation(temperature, salinity);
     final cs20 = getO2Saturation(20, salinity);
-    final cs20KgM3 = cs20 * 0.001; // mg/L to kg/m³
+    final cs20KgM3 = cs20 * 0.001;
 
-    final klaT = 1.1 / ((t70 - t10) / 60); // Convert time difference to hours
-    final kla20 = klaT * pow(1.024, 20 - temperature).toDouble(); // Use pow from dart:math
+    final klaT = 1.0 / ((t70 - t10) / 60); // No 1.1 factor, keep t10/t70 as fractions
+    final kla20 = klaT * pow(1.024, 20 - temperature).toDouble();
 
-    final sotr = kla20 * cs20KgM3 * volume;
-    final sae = powerKw > 0 ? sotr / powerKw : 0;
-    final costPerKg = sae > 0 ? kwhPrice / sae : double.infinity;
+    final sotr = (kla20 * cs20KgM3 * volume * 100).floorToDouble() / 100; // Truncate to 2 decimals
+    final sae = powerKw > 0 ? (sotr / powerKw * 100).floorToDouble() / 100 : 0; // Truncate to 2 decimals
+    final costPerKg = sae > 0 ? (kwhPrice / sae * 100).floorToDouble() / 100 : double.infinity;
 
     return {
       'Pond Volume (m³)': volume,

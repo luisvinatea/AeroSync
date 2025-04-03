@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'calculator_service_platform.dart';
 import '../calculators/saturation_calculator.dart';
 
@@ -11,6 +11,8 @@ class CalculatorService extends CalculatorServicePlatform {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/o2_data.json');
     await file.writeAsString(data);
-    return ShrimpPondCalculator(file.path);
+    final calculator = ShrimpPondCalculator(file.path);
+    await calculator.loadData(); // Ensure data is loaded before returning
+    return calculator;
   }
 }
