@@ -38,6 +38,10 @@
     body, html {
       touch-action: pan-x pan-y pinch-zoom !important; /* Explicitly allow pinch-zoom */
       -webkit-user-scalable: yes; /* For older Safari versions */
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
     }
 
     /* Loading screen styles - will be hidden when Flutter loads */
@@ -50,7 +54,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      /* Gradient background inspired by the logo */
       background: linear-gradient(180deg, #60A5FA 0%, #1E40AF 100%);
       font-family: 'Montserrat', Arial, sans-serif;
       z-index: 9999;
@@ -155,24 +158,24 @@
   <!-- Flutter app script with loading screen removal -->
   <script src="flutter_bootstrap.js" async></script>
   <script>
-      // Prevent default touch event suppression
-      document.addEventListener('touchstart', function(event) {
-        if (event.touches.length > 1) {
-          event.stopPropagation();
-        }
-      }, { passive: false });
+    // Prevent default touch event suppression
+    document.addEventListener('touchstart', function(event) {
+      if (event.touches.length > 1) {
+        event.stopPropagation();
+      }
+    }, { passive: false });
 
-      // Listen for the Flutter initialization event
-      window.addEventListener('flutter-first-frame', function() {
-        var loadingScreen = document.getElementById('loading-screen');
-        var flutterApp = document.getElementById('flutter-app');
-        loadingScreen.style.opacity = '0';
-        flutterApp.style.display = 'block';
-        
-        setTimeout(function() {
-          loadingScreen.style.display = 'none';
-        }, 500);
-      });
-</script>
+    // Listen for the Flutter initialization event
+    window.addEventListener('flutter-first-frame', function() {
+      var loadingScreen = document.getElementById('loading-screen');
+      var flutterApp = document.getElementById('flutter-app');
+      loadingScreen.style.opacity = '0';
+      flutterApp.style.display = 'block';
+      
+      setTimeout(function() {
+        loadingScreen.style.display = 'none';
+      }, 500);
+    });
+  </script>
 </body>
 </html>
