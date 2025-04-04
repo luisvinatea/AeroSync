@@ -1,30 +1,36 @@
 {
-    "name": "AeraSync",
-    "short_name": "AeraSync",
-    "start_url": "/AeraSync/",
-    "display": "standalone",
-    "background_color": "#1E40AF",
-    "theme_color": "#60A5FA",
-    "icons": [
-      {
-        "src": "icons/aerasync180.png",
-        "sizes": "180x180",
-        "type": "image/png"
-      },
-      {
-        "src": "icons/aerasync400.png",
-        "sizes": "400x400",
-        "type": "image/png"
-      },
-      {
-        "src": "icons/aerasync512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      },
-      {
-        "src": "icons/aerasync1024.png",
-        "sizes": "1024x1024",
-        "type": "image/png"
-      }
-    ]
-  }
+  "name": "AeraSync",
+  "short_name": "AeraSync",
+  "start_url": "/AeraSync/index.html",
+  "scope": "/AeraSync/",
+  "display": "standalone",
+  "background_color": "#1E40AF",
+  "theme_color": "#60A5FA",
+  "icons": [
+    {
+      "src": "/AeraSync/icons/aerasync64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/AeraSync/icons/aerasync180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/AeraSync/icons/aerasync400.png",
+      "sizes": "400x400",
+      "type": "image/png"
+    },
+    {
+      "src": "/AeraSync/icons/aerasync512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/AeraSync/icons/aerasync1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
