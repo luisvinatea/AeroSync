@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' show pow;
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class SaturationCalculator {
   final String dataPath;
@@ -14,23 +15,40 @@ abstract class SaturationCalculator {
 
   Future<void> loadData() async {
     try {
-      final jsonString = await rootBundle.loadString(dataPath);
-      final data = jsonDecode(jsonString) as Map<String, dynamic>;
-      metadata = data['metadata'] as Map<String, dynamic>;
-      matrix = (data['data'] as List).map((row) => (row as List).map((e) => e as double).toList()).toList();
-      tempStep = metadata['temperature_range']['step'] as double;
-      salStep = metadata['salinity_range']['step'] as double;
-      unit = metadata['unit'] as String;
+      final prefs = await SharedPreferences.getInstance();
+      final cachedData = prefs.getString('o2_saturation_data');
+
+      if (cachedData != null) {
+        // Load from cache if available
+        final data = jsonDecode(cachedData) as Map<String, dynamic>;
+        _parseData(data);
+      } else {
+        // Load from assets and cache it
+        final jsonString = await rootBundle.loadString(dataPath);
+        final data = jsonDecode(jsonString) as Map<String, dynamic>;
+        _parseData(data);
+        await prefs.setString('o2_saturation_data', jsonString);
+      }
     } catch (e) {
       throw Exception('Failed to load or parse data from $dataPath: $e');
     }
+  }
+
+  void _parseData(Map<String, dynamic> data) {
+    metadata = data['metadata'] as Map<String, dynamic>;
+    matrix = (data['data'] as List)
+        .map((row) => (row as List).map((e) => e as double).toList())
+        .toList();
+    tempStep = metadata['temperature_range']['step'] as double;
+    salStep = metadata['salinity_range']['step'] as double;
+    unit = metadata['unit'] as String;
   }
 
   double getO2Saturation(double temperature, double salinity) {
     if (!(0 <= temperature && temperature <= 40 && 0 <= salinity && salinity <= 40)) {
       throw ArgumentError('Temperature and salinity must be between 0 and 40');
     }
-    final tempIdx = temperature.round(); // Round temperature to nearest integer
+    final tempIdx = temperature.round();
     final salIdx = (salinity / salStep).floor();
     return matrix[tempIdx][salIdx];
   }
