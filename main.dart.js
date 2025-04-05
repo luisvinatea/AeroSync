@@ -39292,7 +39292,7 @@ A.JM.prototype={
 M(a){var s,r=null,q=A.a9U(a,!0,t.Tz)
 if(q.a)s=B.lG
 else{s=q.b
-s=s!=null?A.k6(A.e6("Error: "+s,r,r,r,B.yB,r,r),r,r):A.o3(A.b([A.eg(new A.N0(new A.wF(r),r),A.bS(a,r,t.w).w.a.b*0.5,r),B.yf,A.rt(new A.Mf(r),1),B.KW],t.D),B.az,B.at,B.bm)}return new A.As(new A.wh(B.Tk,B.c8,B.k,new A.Tv(r,r,1/0,56),r),A.kr(B.ai,A.o5(r,new A.c7(B.eb,s,r),B.C,B.zP,r,r,r,r,r),B.a9,!1,r,r,r,r,r,r,r,r,r,new A.a3W(),new A.a3X(),r,r,r,r,r,r,r,r,r,r,r),r)}}
+s=s!=null?A.k6(A.e6("Error: "+s,r,r,r,B.yB,r,r),r,r):A.o3(A.b([A.eg(new A.N0(new A.wF(r),r),A.bS(a,r,t.w).w.a.b*0.5,r),B.yf,A.rt(new A.Mf(r),1),B.KW],t.D),B.az,B.at,B.bm)}return new A.As(new A.wh(B.Tl,B.c8,B.k,new A.Tv(r,r,1/0,56),r),A.kr(B.ai,A.o5(r,new A.c7(B.eb,s,r),B.C,B.zP,r,r,r,r,r),B.a9,!1,r,r,r,r,r,r,r,r,r,new A.a3W(),new A.a3X(),r,r,r,r,r,r,r,r,r,r,r),r)}}
 A.a3W.prototype={
 $1(a){},
 $S:230}
@@ -39467,13 +39467,13 @@ r=A.kU("0+$",!0,!1)
 s=A.Gr(s,r,"")
 r=A.kU("\\.$",!0,!1)
 return A.Gr(s,r,"")}return J.e_(a)},
-a0M(a,b){var s,r,q,p,o=null,n=A.bw(a.i(0,"KlaT (h\u207b\xb9)")),m=A.bw(b.i(0,"T10 (minutes)"))/60,l=A.bw(b.i(0,"T70 (minutes)"))/60,k=t.ij,j=A.b([],k)
-for(s=-n,r=0;r<=24;r+=0.5)j.push(new A.co((1-Math.exp(s*r))*100,r))
+a0M(a,b){var s,r,q,p,o=null,n=A.bw(a.i(0,"KlaT (h\u207b\xb9)")),m=A.bw(b.i(0,"T10 (minutes)")),l=A.bw(b.i(0,"T70 (minutes)")),k=t.ij,j=A.b([],k)
+for(s=-(n/60),r=0;r<=30;r+=0.5)j.push(new A.co((1-Math.exp(s*r))*100,r))
 s=A.avt(A.aqG(B.cH),!0)
 k=A.b([A.Km(o,2,o,B.c8,0.35,o,B.EC,o,!0,!1,!1,!1,B.jj,!1,10,B.k8,!0,B.fZ,j),A.Km(o,0,o,B.bW,0.35,o,new A.km(!0,A.Y8(),new A.abB()),o,!1,!1,!1,!1,B.jj,!1,10,B.k8,!0,B.fZ,A.b([new A.co(10,m)],k)),A.Km(o,0,o,B.ce,0.35,o,new A.km(!0,A.Y8(),new A.abC()),o,!1,!1,!1,!1,B.jj,!1,10,B.k8,!0,B.fZ,A.b([new A.co(70,l)],k))],t.HS)
 q=B.c.aC(127.5)
 p=t.t
-return new A.yM(A.arF(o,o,o,B.Hr,s,B.AG,new A.rw(A.b([A.arr(A.an(q,B.bW.B()>>>16&255,B.bW.B()>>>8&255,B.bW.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,m),A.arr(A.an(q,B.ce.B()>>>16&255,B.ce.B()>>>8&255,B.ce.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,l)],t.rx),A.b([A.asn(A.an(q,B.bW.B()>>>16&255,B.bW.B()>>>8&255,B.bW.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,10),A.asn(A.an(q,B.ce.B()>>>16&255,B.ce.B()>>>8&255,B.ce.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,70)],t.uM),!0),new A.ry(!0,!0,o,new A.abD(),A.app(),!0,o,new A.abE(),A.app()),k,B.FJ,100,24,0,0,B.LP,B.Ha,new A.rz(!0,new A.k0(16,B.Tl,new A.l1(!0,new A.abF(),40,o),!0),B.le,B.le,new A.k0(16,B.Tr,new A.l1(!0,new A.abG(),30,o),!0))),B.a7,B.e8,o,o)},
+return new A.yM(A.arF(o,o,o,B.Hr,s,B.AG,new A.rw(A.b([A.arr(A.an(q,B.bW.B()>>>16&255,B.bW.B()>>>8&255,B.bW.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,m),A.arr(A.an(q,B.ce.B()>>>16&255,B.ce.B()>>>8&255,B.ce.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,l)],t.rx),A.b([A.asn(A.an(q,B.bW.B()>>>16&255,B.bW.B()>>>8&255,B.bW.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,10),A.asn(A.an(q,B.ce.B()>>>16&255,B.ce.B()>>>8&255,B.ce.B()&255),A.b([5,5],p),o,o,o,o,B.cN,1,70)],t.uM),!0),new A.ry(!0,!0,o,new A.abD(),A.app(),!0,o,new A.abE(),A.app()),k,B.FJ,100,30,0,0,B.LP,B.Ha,new A.rz(!0,new A.k0(16,B.Tk,new A.l1(!0,new A.abF(),40,o),!0),B.le,B.le,new A.k0(16,B.Tr,new A.l1(!0,new A.abG(),30,o),!0))),B.a7,B.e8,o,o)},
 a2C(a,b){var s,r,q,p=A.A(t.N,t.z)
 a.a7(0,new A.abH(p))
 b.a7(0,new A.abI(p))
@@ -39523,7 +39523,7 @@ $1(a){return A.a2k(A.an(51,B.cH.B()>>>16&255,B.cH.B()>>>8&255,B.cH.B()&255),null
 $S:94}
 A.abF.prototype={
 $2(a,b){var s=null
-return A.e6(""+B.c.ac(a)+" h",s,s,s,B.yE,s,s)},
+return A.e6(""+B.c.ac(a)+" min",s,s,s,B.yE,s,s)},
 $S:139}
 A.abG.prototype={
 $2(a,b){var s=null
@@ -88424,8 +88424,8 @@ B.S7=new A.m(!0,B.K,null,".AppleSystemUIFont",null,null,null,null,null,null,null
 B.Ss=new A.m(!0,B.l,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.h,null,null,null,"blackRedwoodCity labelMedium",null,null,null,null)
 B.Pq=new A.m(!0,B.l,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.h,null,null,null,"blackRedwoodCity labelSmall",null,null,null,null)
 B.Tj=new A.dn(B.R4,B.Q8,B.R5,B.RE,B.PM,B.PU,B.Qs,B.Rr,B.QG,B.Sc,B.Pg,B.PB,B.S7,B.Ss,B.Pq)
-B.Tk=new A.dU("AeraSync Calculator",null,null,null,null,null,null,null,null)
-B.Tl=new A.dU("Time (hours)",null,B.dw,null,null,null,null,null,null)
+B.Tk=new A.dU("Time (minutes)",null,B.dw,null,null,null,null,null,null)
+B.Tl=new A.dU("AeraSync Calculator",null,null,null,null,null,null,null,null)
 B.RX=new A.m(!0,B.c8,null,null,null,null,18,B.bz,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Tm=new A.dU("Saturation Over Time",null,B.RX,null,null,null,null,null,null)
 B.Tn=new A.dU("Download as CSV",null,null,null,null,null,null,null,null)
