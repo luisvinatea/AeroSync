@@ -56,13 +56,12 @@ class _CalculatorFormState extends State<CalculatorForm> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Add the logo above the title
                       Center(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),
                           child: Image.asset(
                             'assets/images/aerasync.png',
-                            height: 100, // Adjust size as needed
+                            height: 100,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -95,8 +94,8 @@ class _CalculatorFormState extends State<CalculatorForm> {
                             Expanded(
                               child: Column(
                                 children: [
-                                  _buildTextField(_t10Controller, 'T10 (minutes)', 0, 60),
-                                  _buildTextField(_t70Controller, 'T70 (minutes)', 0, 60),
+                                  _buildTextField(_t10Controller, 'T10 (minutes)', 0, 60, hint: 'For plotting only'),
+                                  _buildTextField(_t70Controller, 'T70 (minutes)', 0.1, 60, isT70: true),
                                   _buildTextField(_kwhController, 'Electricity Cost (\$/kWh)', 0, 1),
                                   TextFormField(
                                     controller: _brandController,
@@ -220,7 +219,14 @@ class _CalculatorFormState extends State<CalculatorForm> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, double min, double max) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label,
+    double min,
+    double max, {
+    String? hint,
+    bool isT70 = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: TextFormField(
@@ -228,6 +234,7 @@ class _CalculatorFormState extends State<CalculatorForm> {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(fontSize: 16),
+          hintText: hint,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
           filled: true,
           fillColor: Colors.grey[100],
@@ -235,68 +242,72 @@ class _CalculatorFormState extends State<CalculatorForm> {
         ),
         style: const TextStyle(fontSize: 16),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        validator: (value) => _validateInput(value, min, max),
+        validator: (value) => _validateInput(value, min, max, isT70: isT70),
       ),
     );
   }
 
-  String? _validateInput(String? value, double min, double max) {
+  String? _validateInput(String? value, double min, double max, {bool isT70 = false}) {
     if (value == null || value.isEmpty) return 'Required';
     final numValue = double.tryParse(value);
     if (numValue == null) return 'Invalid number';
     if (numValue < min || numValue > max) return 'Must be between $min and $max';
+    if (isT70) {
+      final t10 = double.tryParse(_t10Controller.text) ?? 0;
+      if (numValue <= t10) return 'T70 must be greater than T10';
+    }
     return null;
   }
 
-void _calculate() async {
-  final appState = Provider.of<AppState>(context, listen: false);
-  final calculator = appState.calculator;
+  void _calculate() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final calculator = appState.calculator;
 
-  if (calculator == null) {
-    appState.setError('Calculator not initialized');
-    return;
+    if (calculator == null) {
+      appState.setError('Calculator not initialized');
+      return;
+    }
+
+    try {
+      final brand = _brandController.text.isEmpty ? 'Generic' : _brandController.text;
+      final type = _selectedType == 'Other' ? _otherTypeController.text : _selectedType;
+      final temperature = double.parse(_tempController.text);
+      final salinity = double.parse(_salinityController.text);
+      final horsepower = double.parse(_hpController.text);
+      final volume = double.parse(_volumeController.text);
+      final t10 = double.parse(_t10Controller.text);
+      final t70 = double.parse(_t70Controller.text);
+      final kWhPrice = double.parse(_kwhController.text);
+
+      final inputs = {
+        'Temperature (°C)': temperature,
+        'Salinity (‰)': salinity,
+        'Horsepower (HP)': horsepower,
+        'Volume (m³)': volume,
+        'T10 (minutes)': t10,
+        'T70 (minutes)': t70,
+        'Electricity Cost (\$/kWh)': kWhPrice,
+        'Brand': brand,
+        'Aerator Type': type,
+        'Data Collection Consent': _dataCollectionConsent,
+      };
+
+      final results = calculator.calculateMetrics(
+        temperature: temperature,
+        salinity: salinity,
+        horsepower: horsepower,
+        volume: volume,
+        t10: t10,
+        t70: t70,
+        kWhPrice: kWhPrice,
+        aeratorId: '$brand $type',
+      );
+
+      appState.setResults(results, inputs);
+    } catch (e) {
+      appState.setError('Calculation failed: $e');
+    }
   }
-
-  try {
-    final brand = _brandController.text.isEmpty ? 'Generic' : _brandController.text;
-    final type = _selectedType == 'Other' ? _otherTypeController.text : _selectedType;
-    final temperature = double.parse(_tempController.text);
-    final salinity = double.parse(_salinityController.text);
-    final horsepower = double.parse(_hpController.text);
-    final volume = double.parse(_volumeController.text);
-    final t10 = double.parse(_t10Controller.text);
-    final t70 = double.parse(_t70Controller.text);
-    final kWhPrice = double.parse(_kwhController.text);
-
-    final inputs = {
-      'Temperature (°C)': temperature,
-      'Salinity (‰)': salinity,
-      'Horsepower (HP)': horsepower,
-      'Volume (m³)': volume,
-      'T10 (minutes)': t10,
-      'T70 (minutes)': t70,
-      'Electricity Cost (\$/kWh)': kWhPrice,
-      'Brand': brand,
-      'Aerator Type': type,
-      'Data Collection Consent': _dataCollectionConsent,
-    };
-
-    final results = calculator.calculateMetrics(
-      temperature: temperature,
-      salinity: salinity,
-      horsepower: horsepower,
-      volume: volume,
-      t10: t10,
-      t70: t70,
-      kWhPrice: kWhPrice,
-      aeratorId: '$brand $type',
-    );
-
-    appState.setResults(results, inputs);
-  } catch (e) {
-    appState.setError('Calculation failed: $e');
-  }
-}
 
   @override
   void dispose() {

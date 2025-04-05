@@ -19,7 +19,9 @@ abstract class SaturationCalculator {
 
 class ShrimpPondCalculator implements SaturationCalculator {
   final String dataPath;
-  Map<String, dynamic>? _saturationData;
+  List<List<double>>? _matrix;
+  double _tempStep = 1.0;
+  double _salStep = 5.0;
 
   ShrimpPondCalculator(this.dataPath);
 
@@ -27,7 +29,13 @@ class ShrimpPondCalculator implements SaturationCalculator {
   Future<void> loadData() async {
     try {
       final String jsonString = await rootBundle.loadString(dataPath);
-      _saturationData = jsonDecode(jsonString) as Map<String, dynamic>;
+      final data = jsonDecode(jsonString) as Map<String, dynamic>;
+      final metadata = data['metadata'] as Map<String, dynamic>;
+      _matrix = (data['data'] as List)
+          .map((row) => (row as List).map((e) => e as double).toList())
+          .toList();
+      _tempStep = (metadata['temperature_range']['step'] as num).toDouble();
+      _salStep = (metadata['salinity_range']['step'] as num).toDouble();
     } catch (e) {
       throw Exception('Failed to load saturation data: $e');
     }
@@ -35,23 +43,16 @@ class ShrimpPondCalculator implements SaturationCalculator {
 
   @override
   double getO2Saturation(double temperature, double salinity) {
-    if (_saturationData == null) {
-      throw Exception('Saturation data not loaded');
+    if (_matrix == null) throw Exception('Saturation data not loaded');
+    if (!(0 <= temperature && temperature <= 40 && 0 <= salinity && salinity <= 40)) {
+      throw ArgumentError('Temperature and salinity must be between 0 and 40');
     }
-
-    final tempIdx = temperature.round().toString();
-    final salIdx = (salinity / 1.0).round().toString();
-
-    if (_saturationData!.containsKey(tempIdx) &&
-        (_saturationData![tempIdx] as Map).containsKey(salIdx)) {
-      return double.parse(_saturationData![tempIdx][salIdx].toString());
+    final tempIdx = temperature.round();
+    final salIdx = (salinity / _salStep).floor();
+    if (tempIdx >= _matrix!.length || salIdx >= _matrix![0].length) {
+      throw RangeError('Index out of bounds: tempIdx=$tempIdx, salIdx=$salIdx');
     }
-
-    return _interpolateSaturation(temperature, salinity);
-  }
-
-  double _interpolateSaturation(double temperature, double salinity) {
-    return 7.0; // Default fallback
+    return _matrix![tempIdx][salIdx];
   }
 
   String _normalizeBrand(String brand) {
@@ -67,10 +68,7 @@ class ShrimpPondCalculator implements SaturationCalculator {
       'divva': 'Diva', 'wang fa': 'WangFa', 'oxy guard': 'OxyGuard', 'lin': 'LINN',
       'sagr': 'Sagar', 'hcpp': 'HCP', 'yiyuan1': 'Yiyuan',
     };
-
-    if (brand.isEmpty) return 'Generic';
-    final brandLower = brand.toLowerCase().trim();
-    return brandNormalization[brandLower] ?? brand;
+    return brandNormalization[brand.toLowerCase().trim()] ?? (brand.isEmpty ? 'Generic' : brand);
   }
 
   @override
@@ -95,7 +93,8 @@ class ShrimpPondCalculator implements SaturationCalculator {
     final cs20 = getO2Saturation(20, salinity);
     final cs20KgM3 = cs20 * 0.001;
 
-    final klaT = 1.0 / ((t70 - t10) / 60);
+    final deltaT = (t70 - t10) / 60; // Convert to hours
+    final klaT = deltaT > 0 ? 1.099 / deltaT : double.infinity; // h⁻¹
     final kla20 = klaT * pow(1.024, 20 - temperature).toDouble();
 
     final sotr = (kla20 * cs20KgM3 * volume * 100).round() / 100;
@@ -109,7 +108,7 @@ class ShrimpPondCalculator implements SaturationCalculator {
       'Kla20 (h⁻¹)': kla20,
       'SOTR (kg O₂/h)': sotr,
       'SAE (kg O₂/kWh)': sae,
-      'US\$/kg O₂': costPerKg, // Escaped $
+      'US\$/kg O₂': costPerKg,
       'Power (kW)': powerKw,
       'Normalized Aerator ID': normalizedAeratorId,
     };

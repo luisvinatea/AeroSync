@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/services/app_state.dart';
+import 'dart:math' show exp;
 
 class ResultsDisplay extends StatelessWidget {
   const ResultsDisplay({super.key});
@@ -125,21 +126,18 @@ class ResultsDisplay extends StatelessWidget {
   Widget _buildSaturationChart(Map<String, dynamic> results, Map<String, dynamic> inputs) {
     final double t10 = inputs['T10 (minutes)'] as double;
     final double t70 = inputs['T70 (minutes)'] as double;
-
-    final double kBase = 0.111 / t10;
-    final double targetAtT70 = 0.7;
-    final double predictedAtT70 = (kBase * t70) / (1 + kBase * t70);
-    final double kAdjusted = kBase * (targetAtT70 / predictedAtT70);
+    final double klaT = results['KlaT (h⁻¹)'] as double; // Use calculator’s KlaT
+    final double k = klaT / 60; // Convert to min⁻¹
 
     final List<FlSpot> saturationSpots = [];
     for (double t = 0; t <= 30; t += 0.5) {
-      final double saturationFraction = (kAdjusted * t) / (1 + kAdjusted * t);
+      final double saturationFraction = 1 - exp(-k * t); // Correct model
       final double saturationPercent = saturationFraction * 100;
       saturationSpots.add(FlSpot(saturationPercent, t));
     }
 
-    final FlSpot t10Spot = FlSpot(10, t10);
-    final FlSpot t70Spot = FlSpot(70, t70);
+    final FlSpot t10Spot = FlSpot((1 - exp(-k * t10)) * 100, t10);
+    final FlSpot t70Spot = FlSpot((1 - exp(-k * t70)) * 100, t70);
 
     return LineChart(
       LineChartData(
@@ -223,8 +221,8 @@ class ResultsDisplay extends StatelessWidget {
             HorizontalLine(y: t70, color: Colors.green.withOpacity(0.5), strokeWidth: 1, dashArray: [5, 5]),
           ],
           verticalLines: [
-            VerticalLine(x: 10, color: Colors.red.withOpacity(0.5), strokeWidth: 1, dashArray: [5, 5]),
-            VerticalLine(x: 70, color: Colors.green.withOpacity(0.5), strokeWidth: 1, dashArray: [5, 5]),
+            VerticalLine(x: t10Spot.x, color: Colors.red.withOpacity(0.5), strokeWidth: 1, dashArray: [5, 5]),
+            VerticalLine(x: t70Spot.x, color: Colors.green.withOpacity(0.5), strokeWidth: 1, dashArray: [5, 5]),
           ],
         ),
       ),
@@ -233,18 +231,10 @@ class ResultsDisplay extends StatelessWidget {
 
   void _downloadAsCsv(Map<String, dynamic> inputs, Map<String, dynamic> results) {
     final combinedData = <String, dynamic>{};
+    inputs.forEach((key, value) => combinedData['Input: $key'] = value);
+    results.forEach((key, value) => combinedData['Result: $key'] = value);
 
-    inputs.forEach((key, value) {
-      combinedData['Input: $key'] = value;
-    });
-
-    results.forEach((key, value) {
-      combinedData['Result: $key'] = value;
-    });
-
-    final csvRows = <String>[];
-    csvRows.add('"Category","Value"');
-
+    final csvRows = <String>['"Category","Value"'];
     combinedData.forEach((key, value) {
       final escapedKey = key.replaceAll('"', '""');
       final escapedValue = _formatValue(value).replaceAll('"', '""');
