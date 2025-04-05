@@ -19,11 +19,9 @@ abstract class SaturationCalculator {
       final cachedData = prefs.getString('o2_saturation_data');
 
       if (cachedData != null) {
-        // Load from cache if available
         final data = jsonDecode(cachedData) as Map<String, dynamic>;
         _parseData(data);
       } else {
-        // Load from assets and cache it
         final jsonString = await rootBundle.loadString(dataPath);
         final data = jsonDecode(jsonString) as Map<String, dynamic>;
         _parseData(data);
@@ -48,9 +46,33 @@ abstract class SaturationCalculator {
     if (!(0 <= temperature && temperature <= 40 && 0 <= salinity && salinity <= 40)) {
       throw ArgumentError('Temperature and salinity must be between 0 and 40');
     }
-    final tempIdx = temperature.round();
-    final salIdx = (salinity / salStep).floor();
-    return matrix[tempIdx][salIdx];
+
+    // Calculate indices and fractional parts for interpolation
+    final tempLowIdx = temperature ~/ tempStep; // Integer division for lower bound
+    final tempHighIdx = (tempLowIdx + 1).clamp(0, matrix.length - 1);
+    final tempLow = tempLowIdx * tempStep;
+    final tempHigh = tempHighIdx * tempStep;
+    final tempFraction = (temperature - tempLow) / tempStep;
+
+    final salLowIdx = salinity ~/ salStep;
+    final salHighIdx = (salLowIdx + 1).clamp(0, matrix[0].length - 1);
+    final salLow = salLowIdx * salStep;
+    final salHigh = salHighIdx * salStep;
+    final salFraction = (salinity - salLow) / salStep;
+
+    // Get the four corner values from the matrix
+    final v00 = matrix[tempLowIdx][salLowIdx]; // Low temp, low salinity
+    final v01 = matrix[tempLowIdx][salHighIdx]; // Low temp, high salinity
+    final v10 = matrix[tempHighIdx][salLowIdx]; // High temp, low salinity
+    final v11 = matrix[tempHighIdx][salHighIdx]; // High temp, high salinity
+
+    // Perform bilinear interpolation
+    final interpolatedValue = (1 - tempFraction) * (1 - salFraction) * v00 +
+                              (1 - tempFraction) * salFraction * v01 +
+                              tempFraction * (1 - salFraction) * v10 +
+                              tempFraction * salFraction * v11;
+
+    return interpolatedValue;
   }
 
   double calculateSotr(double temperature, double salinity, double volume, {double efficiency = 0.9});

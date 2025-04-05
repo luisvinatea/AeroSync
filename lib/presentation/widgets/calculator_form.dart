@@ -57,6 +57,17 @@ class _CalculatorFormState extends State<CalculatorForm> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Add the logo above the title
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Image.asset(
+                            'assets/images/aerasync.png',
+                            height: 100, // Adjust size as needed
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
                       const Text(
                         'Aerator Performance Calculator',
                         style: TextStyle(
@@ -158,7 +169,7 @@ class _CalculatorFormState extends State<CalculatorForm> {
                           Row(
                             children: [
                               Transform.scale(
-                                scale: 1.5, // Increased checkbox size
+                                scale: 1.5,
                                 child: Checkbox(
                                   value: _dataCollectionConsent,
                                   onChanged: (value) {

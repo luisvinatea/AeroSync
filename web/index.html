@@ -12,14 +12,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AeraSync">
-  <link rel="apple-touch-icon" href="/AeraSync/icons/aerasync180.png">
+  <!-- Updated apple-touch-icon links -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/AeraSync/icons/aerasync180.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/AeraSync/icons/aerasync512.png">
+  <link rel="apple-touch-icon" sizes="1024x1024" href="/AeraSync/icons/aerasync1024.png">
   <link rel="icon" type="image/png" href="/AeraSync/icons/aerasync64.png">
   <title>AeraSync - Aerator Calculator</title>
   <link rel="manifest" href="/AeraSync/manifest.json">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
+  <!-- Rest of your styles remain unchanged -->
   <style>
-    /* Your existing styles remain unchanged */
     body, html {
       touch-action: pan-x pan-y pinch-zoom !important;
       -webkit-user-scalable: yes;
@@ -118,7 +121,7 @@
   <div id="flutter-app"></div>
   <script src="/AeraSync/flutter_bootstrap.js" async></script>
   <script>
-    // Register the service worker for offline support
+    // Register Flutter's service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/AeraSync/flutter_service_worker.js')
