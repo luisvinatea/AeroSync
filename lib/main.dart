@@ -6,7 +6,7 @@ import 'presentation/screens/home_screen.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => AppState()..initCalculator(),
+      create: (context) => AppState(), // Constructor calls initCalculator
       child: const MyApp(),
     ),
   );

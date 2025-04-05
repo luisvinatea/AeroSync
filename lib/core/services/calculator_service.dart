@@ -1,6 +1,4 @@
 import 'calculator_service_platform.dart';
-import '../calculators/saturation_calculator.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class CalculatorService implements CalculatorServicePlatform {
   @override

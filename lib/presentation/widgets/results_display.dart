@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:fl_chart/fl_chart.dart';
-import 'dart:math' show exp; // Import exp from dart:math
 import '../../core/services/app_state.dart';
 
 class ResultsDisplay extends StatelessWidget {
@@ -73,7 +72,7 @@ class ResultsDisplay extends StatelessWidget {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                     const SizedBox(height: 16),
                     const Text(
                       'Saturation Over Time',
@@ -124,18 +123,21 @@ class ResultsDisplay extends StatelessWidget {
   }
 
   Widget _buildSaturationChart(Map<String, dynamic> results, Map<String, dynamic> inputs) {
-    final double klaT = results['KlaT (h⁻¹)'] as double;
-    final double t10 = (inputs['T10 (minutes)'] as double) / 60; // Cast first, then divide
-    final double t70 = (inputs['T70 (minutes)'] as double) / 60; // Cast first, then divide
+    final double t10 = inputs['T10 (minutes)'] as double;
+    final double t70 = inputs['T70 (minutes)'] as double;
 
-    // Generate saturation curve data (0 to 24 hours)
+    final double kBase = 0.111 / t10;
+    final double targetAtT70 = 0.7;
+    final double predictedAtT70 = (kBase * t70) / (1 + kBase * t70);
+    final double kAdjusted = kBase * (targetAtT70 / predictedAtT70);
+
     final List<FlSpot> saturationSpots = [];
-    for (double t = 0; t <= 24; t += 0.5) {
-      final double saturationPercent = (1 - exp(-klaT * t)) * 100;
+    for (double t = 0; t <= 30; t += 0.5) {
+      final double saturationFraction = (kAdjusted * t) / (1 + kAdjusted * t);
+      final double saturationPercent = saturationFraction * 100;
       saturationSpots.add(FlSpot(saturationPercent, t));
     }
 
-    // Pinpoints for t10 and t70
     final FlSpot t10Spot = FlSpot(10, t10);
     final FlSpot t70Spot = FlSpot(70, t70);
 
@@ -153,11 +155,11 @@ class ResultsDisplay extends StatelessWidget {
               showTitles: true,
               reservedSize: 40,
               getTitlesWidget: (value, meta) => Text(
-                '${value.toInt()} h',
+                '${value.toInt()} min',
                 style: const TextStyle(fontSize: 12),
               ),
             ),
-            axisNameWidget: const Text('Time (hours)', style: TextStyle(fontWeight: FontWeight.bold)),
+            axisNameWidget: const Text('Time (minutes)', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
@@ -177,7 +179,7 @@ class ResultsDisplay extends StatelessWidget {
         minX: 0,
         maxX: 100,
         minY: 0,
-        maxY: 24,
+        maxY: 30,
         lineBarsData: [
           LineChartBarData(
             spots: saturationSpots,
@@ -231,7 +233,7 @@ class ResultsDisplay extends StatelessWidget {
 
   void _downloadAsCsv(Map<String, dynamic> inputs, Map<String, dynamic> results) {
     final combinedData = <String, dynamic>{};
-    
+
     inputs.forEach((key, value) {
       combinedData['Input: $key'] = value;
     });
@@ -253,7 +255,7 @@ class ResultsDisplay extends StatelessWidget {
     final blob = html.Blob([csvContent], 'text/csv');
     final url = html.Url.createObjectUrlFromBlob(blob);
 
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'aerasync_data_${DateTime.now().toIso8601String()}.csv')
       ..click();
 

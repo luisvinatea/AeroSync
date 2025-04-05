@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/services/app_state.dart';
-import '../../core/calculators/saturation_calculator.dart';
 
 class CalculatorForm extends StatefulWidget {
   const CalculatorForm({super.key});
@@ -249,55 +248,55 @@ class _CalculatorFormState extends State<CalculatorForm> {
     return null;
   }
 
-  void _calculate() async {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final calculator = appState.calculator;
+void _calculate() async {
+  final appState = Provider.of<AppState>(context, listen: false);
+  final calculator = appState.calculator;
 
-    if (calculator == null) {
-      appState.setError('Calculator not initialized');
-      return;
-    }
-
-    try {
-      final brand = _brandController.text.isEmpty ? 'Generic' : _brandController.text;
-      final type = _selectedType == 'Other' ? _otherTypeController.text : _selectedType;
-      final temperature = double.parse(_tempController.text);
-      final salinity = double.parse(_salinityController.text);
-      final hp = double.parse(_hpController.text);
-      final volume = double.parse(_volumeController.text);
-      final t10 = double.parse(_t10Controller.text);
-      final t70 = double.parse(_t70Controller.text);
-      final kwhPrice = double.parse(_kwhController.text);
-
-      final inputs = {
-        'Temperature (°C)': temperature,
-        'Salinity (‰)': salinity,
-        'Horsepower (HP)': hp,
-        'Volume (m³)': volume,
-        'T10 (minutes)': t10,
-        'T70 (minutes)': t70,
-        'Electricity Cost (\$/kWh)': kwhPrice,
-        'Brand': brand,
-        'Aerator Type': type,
-        'Data Collection Consent': _dataCollectionConsent,
-      };
-
-      final results = calculator.calculateMetrics(
-        temperature: temperature,
-        salinity: salinity,
-        hp: hp,
-        volume: volume,
-        t10: t10,
-        t70: t70,
-        kwhPrice: kwhPrice,
-        aeratorId: '$brand $type',
-      );
-
-      appState.setResults(results, inputs);
-    } catch (e) {
-      appState.setError('Calculation failed: $e');
-    }
+  if (calculator == null) {
+    appState.setError('Calculator not initialized');
+    return;
   }
+
+  try {
+    final brand = _brandController.text.isEmpty ? 'Generic' : _brandController.text;
+    final type = _selectedType == 'Other' ? _otherTypeController.text : _selectedType;
+    final temperature = double.parse(_tempController.text);
+    final salinity = double.parse(_salinityController.text);
+    final horsepower = double.parse(_hpController.text);
+    final volume = double.parse(_volumeController.text);
+    final t10 = double.parse(_t10Controller.text);
+    final t70 = double.parse(_t70Controller.text);
+    final kWhPrice = double.parse(_kwhController.text);
+
+    final inputs = {
+      'Temperature (°C)': temperature,
+      'Salinity (‰)': salinity,
+      'Horsepower (HP)': horsepower,
+      'Volume (m³)': volume,
+      'T10 (minutes)': t10,
+      'T70 (minutes)': t70,
+      'Electricity Cost (\$/kWh)': kWhPrice,
+      'Brand': brand,
+      'Aerator Type': type,
+      'Data Collection Consent': _dataCollectionConsent,
+    };
+
+    final results = calculator.calculateMetrics(
+      temperature: temperature,
+      salinity: salinity,
+      horsepower: horsepower,
+      volume: volume,
+      t10: t10,
+      t70: t70,
+      kWhPrice: kWhPrice,
+      aeratorId: '$brand $type',
+    );
+
+    appState.setResults(results, inputs);
+  } catch (e) {
+    appState.setError('Calculation failed: $e');
+  }
+}
 
   @override
   void dispose() {
