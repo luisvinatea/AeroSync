@@ -260,54 +260,58 @@ class _CalculatorFormState extends State<CalculatorForm> {
   }
 
   void _calculate() async {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final calculator = appState.calculator;
+  final appState = Provider.of<AppState>(context, listen: false);
+  final calculator = appState.calculator;
 
-    if (calculator == null) {
-      appState.setError('Calculator not initialized');
-      return;
-    }
-
-    try {
-      final brand = _brandController.text.isEmpty ? 'Generic' : _brandController.text;
-      final type = _selectedType == 'Other' ? _otherTypeController.text : _selectedType;
-      final temperature = double.parse(_tempController.text);
-      final salinity = double.parse(_salinityController.text);
-      final horsepower = double.parse(_hpController.text);
-      final volume = double.parse(_volumeController.text);
-      final t10 = double.parse(_t10Controller.text);
-      final t70 = double.parse(_t70Controller.text);
-      final kWhPrice = double.parse(_kwhController.text);
-
-      final inputs = {
-        'Temperature (°C)': temperature,
-        'Salinity (‰)': salinity,
-        'Horsepower (HP)': horsepower,
-        'Volume (m³)': volume,
-        'T10 (minutes)': t10,
-        'T70 (minutes)': t70,
-        'Electricity Cost (\$/kWh)': kWhPrice,
-        'Brand': brand,
-        'Aerator Type': type,
-        'Data Collection Consent': _dataCollectionConsent,
-      };
-
-      final results = calculator.calculateMetrics(
-        temperature: temperature,
-        salinity: salinity,
-        horsepower: horsepower,
-        volume: volume,
-        t10: t10,
-        t70: t70,
-        kWhPrice: kWhPrice,
-        aeratorId: '$brand $type',
-      );
-
-      appState.setResults(results, inputs);
-    } catch (e) {
-      appState.setError('Calculation failed: $e');
-    }
+  if (calculator == null) {
+    appState.setError('Calculator not initialized');
+    return;
   }
+
+  try {
+    final brand = _brandController.text.isEmpty ? 'Generic' : _brandController.text;
+    final type = _selectedType == 'Other' ? _otherTypeController.text : _selectedType;
+    final temperature = double.parse(_tempController.text);
+    final salinity = double.parse(_salinityController.text);
+    final horsepower = double.parse(_hpController.text);
+    final volume = double.parse(_volumeController.text);
+    final t10 = double.parse(_t10Controller.text);
+    final t70 = double.parse(_t70Controller.text);
+    final kWhPrice = double.parse(_kwhController.text);
+
+    final inputs = {
+      'Temperature (°C)': double.parse(temperature.toStringAsFixed(2)),
+      'Salinity (‰)': double.parse(salinity.toStringAsFixed(2)),
+      'Horsepower (HP)': double.parse(horsepower.toStringAsFixed(2)),
+      'Volume (m³)': double.parse(volume.toStringAsFixed(2)),
+      'T10 (minutes)': double.parse(t10.toStringAsFixed(2)),
+      'T70 (minutes)': double.parse(t70.toStringAsFixed(2)),
+      'Electricity Cost (\$/kWh)': double.parse(kWhPrice.toStringAsFixed(2)),
+      'Brand': brand,
+      'Aerator Type': type,
+      'Data Collection Consent': _dataCollectionConsent,
+    };
+
+    final results = calculator.calculateMetrics(
+      temperature: temperature,
+      salinity: salinity,
+      horsepower: horsepower,
+      volume: volume,
+      t10: t10,
+      t70: t70,
+      kWhPrice: kWhPrice,
+      aeratorId: '$brand $type',
+    );
+
+    // Ensure all result values have exactly 2 decimal places
+    final formattedResults = results.map((key, value) => 
+      MapEntry(key, value is double ? double.parse(value.toStringAsFixed(2)) : value));
+
+    appState.setResults(formattedResults, inputs);
+  } catch (e) {
+    appState.setError('Calculation failed: $e');
+  }
+}
 
   @override
   void dispose() {

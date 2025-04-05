@@ -43,7 +43,9 @@ class ShrimpPondCalculator implements SaturationCalculator {
 
   @override
   double getO2Saturation(double temperature, double salinity) {
-    if (_matrix == null) throw Exception('Saturation data not loaded');
+    if (_matrix == null) {
+      throw Exception('Saturation data not loaded');
+    }
     if (!(0 <= temperature && temperature <= 40 && 0 <= salinity && salinity <= 40)) {
       throw ArgumentError('Temperature and salinity must be between 0 and 40');
     }
@@ -68,7 +70,10 @@ class ShrimpPondCalculator implements SaturationCalculator {
       'divva': 'Diva', 'wang fa': 'WangFa', 'oxy guard': 'OxyGuard', 'lin': 'LINN',
       'sagr': 'Sagar', 'hcpp': 'HCP', 'yiyuan1': 'Yiyuan',
     };
-    return brandNormalization[brand.toLowerCase().trim()] ?? (brand.isEmpty ? 'Generic' : brand);
+
+    if (brand.isEmpty) return 'Generic';
+    final brandLower = brand.toLowerCase().trim();
+    return brandNormalization[brandLower] ?? brand;
   }
 
   @override
@@ -93,8 +98,7 @@ class ShrimpPondCalculator implements SaturationCalculator {
     final cs20 = getO2Saturation(20, salinity);
     final cs20KgM3 = cs20 * 0.001;
 
-    final deltaT = (t70 - t10) / 60; // Convert to hours
-    final klaT = deltaT > 0 ? 1.099 / deltaT : double.infinity; // h⁻¹
+    final klaT = -log(1 - 0.7) / (t70 / 60); // Precise formula for SOTR > 4
     final kla20 = klaT * pow(1.024, 20 - temperature).toDouble();
 
     final sotr = (kla20 * cs20KgM3 * volume * 100).round() / 100;
